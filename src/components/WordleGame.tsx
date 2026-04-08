@@ -8,6 +8,7 @@ import { getRandomWord, isValidWord } from '@/lib/words';
 import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
 
 const MAX_GUESSES = 6;
+const MAX_HINTS = 2;
 
 export default function WordleGame() {
   const [secretWord, setSecretWord] = useState(() => getRandomWord());
@@ -21,6 +22,8 @@ export default function WordleGame() {
   const [showStats, setShowStats] = useState(false);
   const [stats, setStats] = useState<GameStats>(getStats);
   const [toast, setToast] = useState('');
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [revealedHints, setRevealedHints] = useState<number[]>([]);
   const toastTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const showToast = useCallback((msg: string) => {
