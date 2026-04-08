@@ -152,6 +152,16 @@ export default function WordleGame() {
 
       <Keyboard keyStates={keyStates} onKey={handleKey} />
 
+      {!gameOver && (
+        <button
+          onClick={showHint}
+          disabled={hintsUsed >= MAX_HINTS}
+          className="neon-glow-btn-secondary text-xs px-4 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          💡 Hint ({MAX_HINTS - hintsUsed} left)
+        </button>
+      )}
+
       {gameOver && (
         <div className="flex gap-3 mt-2">
           <button onClick={newGame} className="neon-glow-btn text-sm">
