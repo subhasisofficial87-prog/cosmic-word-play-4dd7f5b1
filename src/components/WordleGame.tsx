@@ -8,6 +8,7 @@ import { getRandomWord, isValidWord } from '@/lib/words';
 import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
 
 const MAX_GUESSES = 6;
+const MAX_HINTS = 2;
 
 export default function WordleGame() {
   const [secretWord, setSecretWord] = useState(() => getRandomWord());
@@ -21,6 +22,8 @@ export default function WordleGame() {
   const [showStats, setShowStats] = useState(false);
   const [stats, setStats] = useState<GameStats>(getStats);
   const [toast, setToast] = useState('');
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [revealedHints, setRevealedHints] = useState<number[]>([]);
   const toastTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const showToast = useCallback((msg: string) => {
@@ -106,6 +109,16 @@ export default function WordleGame() {
     return () => window.removeEventListener('keydown', handler);
   }, [handleKey]);
 
+  const showHint = useCallback(() => {
+    if (gameOver || hintsUsed >= MAX_HINTS) return;
+    const unrevealed = [0, 1, 2, 3, 4].filter(i => !revealedHints.includes(i));
+    if (unrevealed.length === 0) return;
+    const idx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+    setRevealedHints(prev => [...prev, idx]);
+    setHintsUsed(prev => prev + 1);
+    showToast(`Hint: Letter ${idx + 1} is "${secretWord[idx].toUpperCase()}"`);
+  }, [gameOver, hintsUsed, revealedHints, secretWord, showToast]);
+
   const newGame = useCallback(() => {
     setSecretWord(getRandomWord());
     setGuesses([]);
@@ -115,6 +128,8 @@ export default function WordleGame() {
     setWon(false);
     setShowStats(false);
     setRevealingRow(null);
+    setHintsUsed(0);
+    setRevealedHints([]);
   }, []);
 
   return (
@@ -136,6 +151,16 @@ export default function WordleGame() {
       />
 
       <Keyboard keyStates={keyStates} onKey={handleKey} />
+
+      {!gameOver && (
+        <button
+          onClick={showHint}
+          disabled={hintsUsed >= MAX_HINTS}
+          className="neon-glow-btn-secondary text-xs px-4 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          💡 Hint ({MAX_HINTS - hintsUsed} left)
+        </button>
+      )}
 
       {gameOver && (
         <div className="flex gap-3 mt-2">
