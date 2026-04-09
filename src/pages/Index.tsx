@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Home, ArrowLeft } from 'lucide-react';
 import StarField from '@/components/StarField';
 import WordleGame from '@/components/WordleGame';
 import HowToPlayModal from '@/components/HowToPlayModal';
 
 const Index = () => {
   const [showHelp, setShowHelp] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="cosmic-bg min-h-screen flex flex-col relative">
@@ -12,7 +15,22 @@ const Index = () => {
       
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 py-4 sm:py-6 border-b border-border/30">
-        <div className="w-24" />
+        <div className="w-24 flex gap-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="neon-glow-btn-secondary text-xs p-1.5"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="neon-glow-btn-secondary text-xs p-1.5"
+            aria-label="Home"
+          >
+            <Home className="w-4 h-4" />
+          </button>
+        </div>
         <h1 className="text-lg sm:text-xl tracking-widest">
           <span className="neon-text-cyan">MY</span>{' '}
           <span className="neon-text-pink">WORD</span>{' '}
