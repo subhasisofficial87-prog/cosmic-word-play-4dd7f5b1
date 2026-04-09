@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Home, ArrowLeft } from 'lucide-react';
 import StarField from '@/components/StarField';
 import WordleGame from '@/components/WordleGame';
 import HowToPlayModal from '@/components/HowToPlayModal';
