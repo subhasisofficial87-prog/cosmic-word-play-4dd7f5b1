@@ -7,10 +7,12 @@ import { evaluateGuess, updateKeyboardState, type TileState, type KeyboardState 
 import { getRandomWord, isValidWord } from '@/lib/words';
 import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
 
-const MAX_GUESSES = 6;
-const MAX_HINTS = 2;
+interface WordleGameProps {
+  maxGuesses?: number;
+  maxHints?: number;
+}
 
-export default function WordleGame() {
+export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameProps) {
   const [secretWord, setSecretWord] = useState(() => getRandomWord());
   const [guesses, setGuesses] = useState<TileState[][]>([]);
   const [currentGuess, setCurrentGuess] = useState('');
@@ -62,7 +64,7 @@ export default function WordleGame() {
     setKeyStates(prev => updateKeyboardState(prev, evaluation));
 
     const isWin = evaluation.every(t => t.state === 'correct');
-    const isLoss = !isWin && rowIndex + 1 >= MAX_GUESSES;
+    const isLoss = !isWin && rowIndex + 1 >= maxGuesses;
 
     setTimeout(() => {
       setRevealingRow(null);
@@ -75,14 +77,13 @@ export default function WordleGame() {
         setStats(s);
         setTimeout(() => setShowStats(true), 1500);
       } else if (isLoss) {
-        setGameOver(false);
         setGameOver(true);
         const s = recordLoss();
         setStats(s);
         setTimeout(() => setShowStats(true), 1000);
       }
     }, 5 * 200 + 300);
-  }, [currentGuess, secretWord, guesses.length, showToast, fireConfetti]);
+  }, [currentGuess, secretWord, guesses.length, maxGuesses, showToast, fireConfetti]);
 
   const handleKey = useCallback((key: string) => {
     if (gameOver) return;
@@ -97,7 +98,6 @@ export default function WordleGame() {
     }
   }, [gameOver, revealingRow, currentGuess, submitGuess]);
 
-  // Physical keyboard
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -110,14 +110,14 @@ export default function WordleGame() {
   }, [handleKey]);
 
   const showHint = useCallback(() => {
-    if (gameOver || hintsUsed >= MAX_HINTS) return;
+    if (gameOver || hintsUsed >= maxHints) return;
     const unrevealed = [0, 1, 2, 3, 4].filter(i => !revealedHints.includes(i));
     if (unrevealed.length === 0) return;
     const idx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
     setRevealedHints(prev => [...prev, idx]);
     setHintsUsed(prev => prev + 1);
     showToast(`Hint: Letter ${idx + 1} is "${secretWord[idx].toUpperCase()}"`);
-  }, [gameOver, hintsUsed, revealedHints, secretWord, showToast]);
+  }, [gameOver, hintsUsed, maxHints, revealedHints, secretWord, showToast]);
 
   const newGame = useCallback(() => {
     setSecretWord(getRandomWord());
@@ -134,7 +134,6 @@ export default function WordleGame() {
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-lg mx-auto px-2">
-      {/* Toast */}
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-foreground text-background px-4 py-2 rounded-lg font-body font-bold text-sm animate-bounce-in">
           {toast}
@@ -145,20 +144,20 @@ export default function WordleGame() {
         guesses={guesses}
         currentGuess={currentGuess}
         currentRow={guesses.length}
-        maxGuesses={MAX_GUESSES}
+        maxGuesses={maxGuesses}
         shaking={shaking}
         revealingRow={revealingRow}
       />
 
       <Keyboard keyStates={keyStates} onKey={handleKey} />
 
-      {!gameOver && (
+      {!gameOver && maxHints > 0 && (
         <button
           onClick={showHint}
-          disabled={hintsUsed >= MAX_HINTS}
+          disabled={hintsUsed >= maxHints}
           className="neon-glow-btn-secondary text-xs px-4 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
         >
-          💡 Hint ({MAX_HINTS - hintsUsed} left)
+          💡 Hint ({maxHints - hintsUsed} left)
         </button>
       )}
 
