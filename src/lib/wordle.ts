@@ -7,26 +7,25 @@ export interface TileState {
 
 /**
  * Evaluate a guess against the secret word using standard Wordle rules.
- * Handles duplicate letters properly.
+ * Handles duplicate letters properly and variable word lengths.
  */
 export function evaluateGuess(guess: string, secret: string): TileState[] {
+  const len = secret.length;
   const g = guess.toLowerCase().split('');
   const s = secret.toLowerCase().split('');
   const result: TileState[] = g.map(l => ({ letter: l, state: 'absent' as LetterState }));
-  const secretUsed = new Array(5).fill(false);
+  const secretUsed = new Array(len).fill(false);
 
-  // First pass: mark correct (green)
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < len; i++) {
     if (g[i] === s[i]) {
       result[i].state = 'correct';
       secretUsed[i] = true;
     }
   }
 
-  // Second pass: mark present (yellow)
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < len; i++) {
     if (result[i].state === 'correct') continue;
-    for (let j = 0; j < 5; j++) {
+    for (let j = 0; j < len; j++) {
       if (!secretUsed[j] && g[i] === s[j]) {
         result[i].state = 'present';
         secretUsed[j] = true;
