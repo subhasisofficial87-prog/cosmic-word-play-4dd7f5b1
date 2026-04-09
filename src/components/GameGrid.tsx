@@ -6,6 +6,7 @@ interface GameGridProps {
   currentGuess: string;
   currentRow: number;
   maxGuesses: number;
+  wordLength: number;
   shaking: boolean;
   revealingRow: number | null;
 }
@@ -18,19 +19,30 @@ const stateClass: Record<LetterState, string> = {
   tbd: 'tile-filled',
 };
 
+// Responsive tile sizes based on word length
+const tileSize: Record<number, string> = {
+  4: 'w-14 h-14 sm:w-16 sm:h-16 text-2xl',
+  5: 'w-14 h-14 sm:w-16 sm:h-16 text-2xl',
+  6: 'w-12 h-12 sm:w-14 sm:h-14 text-xl',
+  7: 'w-10 h-10 sm:w-12 sm:h-12 text-lg',
+  8: 'w-9 h-9 sm:w-11 sm:h-11 text-base',
+};
+
 export default function GameGrid({
   guesses,
   currentGuess,
   currentRow,
   maxGuesses,
+  wordLength,
   shaking,
   revealingRow,
 }: GameGridProps) {
   const rows = [];
+  const size = tileSize[wordLength] || tileSize[5];
 
   for (let r = 0; r < maxGuesses; r++) {
     const tiles = [];
-    for (let c = 0; c < 5; c++) {
+    for (let c = 0; c < wordLength; c++) {
       let letter = '';
       let state: LetterState = 'empty';
 
@@ -48,7 +60,7 @@ export default function GameGrid({
       tiles.push(
         <motion.div
           key={`${r}-${c}`}
-          className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-2xl font-bold rounded-lg uppercase font-body select-none
+          className={`${size} flex items-center justify-center font-bold rounded-lg uppercase font-body select-none
             ${isRevealing ? '' : stateClass[state]}`}
           initial={false}
           animate={
@@ -77,15 +89,12 @@ export default function GameGrid({
                   }
                 : {}
             }
-            className={isRevealing ? '' : ''}
           >
-            {/* After flip midpoint, show revealed state */}
             {letter}
           </motion.span>
-          {/* Overlay for color after reveal */}
           {isRevealing && (
             <motion.div
-              className={`absolute inset-0 rounded-lg flex items-center justify-center text-2xl font-bold uppercase font-body ${stateClass[state]}`}
+              className={`absolute inset-0 rounded-lg flex items-center justify-center font-bold uppercase font-body ${size} ${stateClass[state]}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: delay + 0.25, duration: 0.01 }}

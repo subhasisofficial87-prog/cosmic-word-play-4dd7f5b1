@@ -10,10 +10,11 @@ import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
 interface WordleGameProps {
   maxGuesses?: number;
   maxHints?: number;
+  wordLength?: number;
 }
 
-export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameProps) {
-  const [secretWord, setSecretWord] = useState(() => getRandomWord());
+export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 5 }: WordleGameProps) {
+  const [secretWord, setSecretWord] = useState(() => getRandomWord(wordLength));
   const [guesses, setGuesses] = useState<TileState[][]>([]);
   const [currentGuess, setCurrentGuess] = useState('');
   const [keyStates, setKeyStates] = useState<KeyboardState>({});
@@ -41,7 +42,7 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
   }, []);
 
   const submitGuess = useCallback(() => {
-    if (currentGuess.length !== 5) {
+    if (currentGuess.length !== wordLength) {
       setShaking(true);
       showToast('Not enough letters');
       setTimeout(() => setShaking(false), 500);
@@ -82,8 +83,8 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
         setStats(s);
         setTimeout(() => setShowStats(true), 1000);
       }
-    }, 5 * 200 + 300);
-  }, [currentGuess, secretWord, guesses.length, maxGuesses, showToast, fireConfetti]);
+    }, wordLength * 200 + 300);
+  }, [currentGuess, secretWord, guesses.length, maxGuesses, wordLength, showToast, fireConfetti]);
 
   const handleKey = useCallback((key: string) => {
     if (gameOver) return;
@@ -93,10 +94,10 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
       submitGuess();
     } else if (key === 'back') {
       setCurrentGuess(prev => prev.slice(0, -1));
-    } else if (key.length === 1 && /^[a-z]$/i.test(key) && currentGuess.length < 5) {
+    } else if (key.length === 1 && /^[a-z]$/i.test(key) && currentGuess.length < wordLength) {
       setCurrentGuess(prev => prev + key.toLowerCase());
     }
-  }, [gameOver, revealingRow, currentGuess, submitGuess]);
+  }, [gameOver, revealingRow, currentGuess, wordLength, submitGuess]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -111,16 +112,16 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
 
   const showHint = useCallback(() => {
     if (gameOver || hintsUsed >= maxHints) return;
-    const unrevealed = [0, 1, 2, 3, 4].filter(i => !revealedHints.includes(i));
+    const unrevealed = Array.from({ length: wordLength }, (_, i) => i).filter(i => !revealedHints.includes(i));
     if (unrevealed.length === 0) return;
     const idx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
     setRevealedHints(prev => [...prev, idx]);
     setHintsUsed(prev => prev + 1);
     showToast(`Hint: Letter ${idx + 1} is "${secretWord[idx].toUpperCase()}"`);
-  }, [gameOver, hintsUsed, maxHints, revealedHints, secretWord, showToast]);
+  }, [gameOver, hintsUsed, maxHints, wordLength, revealedHints, secretWord, showToast]);
 
   const newGame = useCallback(() => {
-    setSecretWord(getRandomWord());
+    setSecretWord(getRandomWord(wordLength));
     setGuesses([]);
     setCurrentGuess('');
     setKeyStates({});
@@ -130,7 +131,7 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
     setRevealingRow(null);
     setHintsUsed(0);
     setRevealedHints([]);
-  }, []);
+  }, [wordLength]);
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-lg mx-auto px-2">
@@ -145,6 +146,7 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2 }: WordleGameP
         currentGuess={currentGuess}
         currentRow={guesses.length}
         maxGuesses={maxGuesses}
+        wordLength={wordLength}
         shaking={shaking}
         revealingRow={revealingRow}
       />
