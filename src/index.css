@@ -67,6 +67,63 @@
     --sidebar-border: 260 30% 22%;
     --sidebar-ring: 180 100% 50%;
   }
+
+  .light {
+    --background: 220 20% 96%;
+    --foreground: 220 30% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
+
+    --primary: 220 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 280 60% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 90%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 160 60% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 82%;
+    --input: 220 15% 82%;
+    --ring: 220 80% 55%;
+
+    /* Game-specific tokens - light */
+    --neon-cyan: 220 80% 55%;
+    --neon-pink: 280 60% 55%;
+    --neon-green: 160 60% 45%;
+    --neon-yellow: 40 90% 50%;
+    --tile-empty: 220 15% 90%;
+    --tile-filled: 220 15% 82%;
+    --tile-correct: 142 72% 42%;
+    --tile-present: 48 96% 50%;
+    --tile-absent: 220 10% 60%;
+    --key-bg: 220 15% 85%;
+    --key-text: 220 30% 15%;
+
+    /* Glow shadows - subtle for light mode */
+    --glow-cyan: 0 2px 10px hsl(220 80% 55% / 0.2);
+    --glow-pink: 0 2px 10px hsl(280 60% 55% / 0.2);
+    --glow-green: 0 2px 10px hsl(160 60% 45% / 0.2);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 30% 15%;
+    --sidebar-primary: 220 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 92%;
+    --sidebar-accent-foreground: 220 30% 15%;
+    --sidebar-border: 220 15% 82%;
+    --sidebar-ring: 220 80% 55%;
+  }
 }
 
 @layer base {
@@ -169,6 +226,10 @@
   .cosmic-bg {
     background: radial-gradient(ellipse at 20% 50%, hsl(280 60% 12%) 0%, hsl(var(--background)) 70%),
                 radial-gradient(ellipse at 80% 20%, hsl(200 60% 10%) 0%, transparent 50%);
+  }
+
+  .light .cosmic-bg {
+    background: linear-gradient(135deg, hsl(220 30% 96%) 0%, hsl(240 20% 94%) 50%, hsl(200 25% 95%) 100%);
   }
 
   @keyframes shake {
