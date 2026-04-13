@@ -6,6 +6,7 @@ import StatsModal from '@/components/StatsModal';
 import { evaluateGuess, updateKeyboardState, type TileState, type KeyboardState } from '@/lib/wordle';
 import { getRandomWord, isValidWord } from '@/lib/words';
 import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
+import { playKeyPress, playBackspace, playSubmit, playError, playWin, playLoss, playHint, playCorrectReveal, playPresentReveal, playAbsentReveal } from '@/lib/sounds';
 
 interface WordleGameProps {
   maxGuesses?: number;
