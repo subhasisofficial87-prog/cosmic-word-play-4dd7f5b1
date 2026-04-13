@@ -6,6 +6,7 @@ import StatsModal from '@/components/StatsModal';
 import { evaluateGuess, updateKeyboardState, type TileState, type KeyboardState } from '@/lib/wordle';
 import { getRandomWord, isValidWord } from '@/lib/words';
 import { getStats, recordWin, recordLoss, type GameStats } from '@/lib/stats';
+import { playKeyPress, playBackspace, playSubmit, playError, playWin, playLoss, playHint, playCorrectReveal, playPresentReveal, playAbsentReveal } from '@/lib/sounds';
 
 interface WordleGameProps {
   maxGuesses?: number;
@@ -45,6 +46,7 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
     if (currentGuess.length !== wordLength) {
       setShaking(true);
       showToast('Not enough letters');
+      playError();
       setTimeout(() => setShaking(false), 500);
       return;
     }
@@ -52,12 +54,23 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
     if (!isValidWord(currentGuess)) {
       setShaking(true);
       showToast('Not in word list');
+      playError();
       setTimeout(() => setShaking(false), 500);
       return;
     }
 
     const evaluation = evaluateGuess(currentGuess, secretWord);
     const rowIndex = guesses.length;
+
+    playSubmit();
+    // Play tile reveal sounds
+    evaluation.forEach((tile, i) => {
+      setTimeout(() => {
+        if (tile.state === 'correct') playCorrectReveal();
+        else if (tile.state === 'present') playPresentReveal();
+        else playAbsentReveal();
+      }, i * 200 + 250);
+    });
 
     setRevealingRow(rowIndex);
     setGuesses(prev => [...prev, evaluation]);
@@ -74,11 +87,13 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
         setWon(true);
         setGameOver(true);
         fireConfetti();
+        playWin();
         const s = recordWin(rowIndex + 1);
         setStats(s);
         setTimeout(() => setShowStats(true), 1500);
       } else if (isLoss) {
         setGameOver(true);
+        playLoss();
         const s = recordLoss();
         setStats(s);
         setTimeout(() => setShowStats(true), 1000);
@@ -93,8 +108,10 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
     if (key === 'enter') {
       submitGuess();
     } else if (key === 'back') {
+      playBackspace();
       setCurrentGuess(prev => prev.slice(0, -1));
     } else if (key.length === 1 && /^[a-z]$/i.test(key) && currentGuess.length < wordLength) {
+      playKeyPress();
       setCurrentGuess(prev => prev + key.toLowerCase());
     }
   }, [gameOver, revealingRow, currentGuess, wordLength, submitGuess]);
@@ -117,6 +134,7 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
     const idx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
     setRevealedHints(prev => [...prev, idx]);
     setHintsUsed(prev => prev + 1);
+    playHint();
     showToast(`Hint: Letter ${idx + 1} is "${secretWord[idx].toUpperCase()}"`);
   }, [gameOver, hintsUsed, maxHints, wordLength, revealedHints, secretWord, showToast]);
 
