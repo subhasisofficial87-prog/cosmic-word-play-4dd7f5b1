@@ -68,7 +68,14 @@ const Index = () => {
           <span className="neon-text-pink">WORD</span>{' '}
           <span className="neon-text-cyan">IS</span>
         </h1>
-        <div className="flex justify-end">
+        <div className="flex items-center gap-2 justify-end">
+          <button
+            onClick={() => { const next = !isMuted(); setMuted(next); setMuteState(next); }}
+            className="neon-glow-btn-secondary text-xs px-2 py-1.5"
+            aria-label={muteState ? 'Unmute' : 'Mute'}
+          >
+            {muteState ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
           <button
             onClick={() => setShowHelp(true)}
             className="neon-glow-btn-secondary text-xs px-3 py-1.5"
