@@ -1,3 +1,8 @@
+let _muted = false;
+
+export function isMuted() { return _muted; }
+export function setMuted(v: boolean) { _muted = v; }
+
 const ctx = () => {
   if (!(window as any).__audioCtx) {
     (window as any).__audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -6,6 +11,7 @@ const ctx = () => {
 };
 
 function playTone(freq: number, duration: number, type: OscillatorType = 'sine', volume = 0.15) {
+  if (_muted) return;
   const c = ctx();
   const osc = c.createOscillator();
   const gain = c.createGain();
