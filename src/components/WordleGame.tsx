@@ -37,9 +37,18 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
   }, []);
 
   const fireConfetti = useCallback(() => {
-    const colors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFFF00'];
-    confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 }, colors });
-    setTimeout(() => confetti({ particleCount: 60, spread: 100, origin: { y: 0.5 }, colors }), 300);
+    const colors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFFF00', '#FF6B6B', '#4ECDC4'];
+    // Initial burst
+    confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 }, colors });
+    // Side cannons
+    setTimeout(() => {
+      confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.65 }, colors });
+      confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.65 }, colors });
+    }, 250);
+    // Rain
+    setTimeout(() => confetti({ particleCount: 80, spread: 120, origin: { y: 0.3 }, colors, gravity: 1.2 }), 500);
+    // Final pop
+    setTimeout(() => confetti({ particleCount: 60, spread: 160, origin: { y: 0.5 }, colors, scalar: 1.2 }), 800);
   }, []);
 
   const submitGuess = useCallback(() => {

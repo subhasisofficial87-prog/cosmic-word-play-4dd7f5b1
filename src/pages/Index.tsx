@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import StarField from '@/components/StarField';
 import WordleGame from '@/components/WordleGame';
 import HowToPlayModal from '@/components/HowToPlayModal';
@@ -20,6 +20,12 @@ const Index = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [wordLength, setWordLength] = useState<number>(5);
   const [muteState, setMuteState] = useState(isMuted());
+  const [lightMode, setLightMode] = useState(() => localStorage.getItem('theme') === 'light');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', lightMode);
+    localStorage.setItem('theme', lightMode ? 'light' : 'dark');
+  }, [lightMode]);
 
   const config = DIFFICULTY_CONFIG[difficulty];
 
@@ -70,6 +76,13 @@ const Index = () => {
           <span className="neon-text-cyan">IS</span>
         </h1>
         <div className="flex items-center gap-2 justify-end">
+          <button
+            onClick={() => setLightMode(p => !p)}
+            className="neon-glow-btn-secondary text-xs px-2 py-1.5"
+            aria-label={lightMode ? 'Dark mode' : 'Light mode'}
+          >
+            {lightMode ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
           <button
             onClick={() => { const next = !isMuted(); setMuted(next); setMuteState(next); }}
             className="neon-glow-btn-secondary text-xs px-2 py-1.5"
