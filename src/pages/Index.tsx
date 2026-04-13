@@ -19,6 +19,7 @@ const Index = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [wordLength, setWordLength] = useState<number>(5);
+  const [muteState, setMuteState] = useState(isMuted());
 
   const config = DIFFICULTY_CONFIG[difficulty];
 
