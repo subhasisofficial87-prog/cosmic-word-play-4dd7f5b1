@@ -88,11 +88,18 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
 
     const isWin = evaluation.every(t => t.state === 'correct');
     const isLoss = !isWin && rowIndex + 1 >= maxGuesses;
+    const correctCount = evaluation.filter(t => t.state === 'correct').length;
+    const presentCount = evaluation.filter(t => t.state === 'present').length;
 
     setTimeout(() => {
       setRevealingRow(null);
 
       if (isWin) {
+        const winMessages = [
+          '🎉 Genius!', '🔥 Magnificent!', '⭐ Impressive!',
+          '💪 Splendid!', '✨ Great!', '😅 Phew!'
+        ];
+        showToast(winMessages[Math.min(rowIndex, winMessages.length - 1)]);
         setWon(true);
         setGameOver(true);
         fireConfetti();
@@ -101,11 +108,27 @@ export default function WordleGame({ maxGuesses = 6, maxHints = 2, wordLength = 
         setStats(s);
         setTimeout(() => setShowStats(true), 1500);
       } else if (isLoss) {
+        showToast(`😢 The word was "${secretWord.toUpperCase()}"`);
         setGameOver(true);
         playLoss();
         const s = recordLoss();
         setStats(s);
         setTimeout(() => setShowStats(true), 1000);
+      } else {
+        const total = correctCount + presentCount;
+        if (correctCount >= 3) {
+          const msgs = ['🔥 So close!', '💥 Almost there!', '🚀 On fire!'];
+          showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        } else if (total >= 3) {
+          const msgs = ['👀 Getting warmer!', '💡 Good thinking!', '🧠 Nice clues!'];
+          showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        } else if (total >= 1) {
+          const msgs = ['🤔 Keep going!', '💭 Not bad!', '👍 Good start!'];
+          showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        } else {
+          const msgs = ['😬 Tough one!', '🫣 Try again!', '💪 Don\'t give up!'];
+          showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        }
       }
     }, wordLength * 200 + 300);
   }, [currentGuess, secretWord, guesses.length, maxGuesses, wordLength, showToast, fireConfetti]);
